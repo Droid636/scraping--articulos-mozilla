@@ -19,27 +19,24 @@ async function obtenerDatosMozillaBlog() {
   const datos = await pagina.evaluate(() => {
     const resultados = [];
     document
-      .querySelectorAll("main>div:first-child>div:nth-child(2)>div>div.o.q")
+      .querySelectorAll("li.list-item.row.listing")
       .forEach((elemento) => {
-        const imagen = elemento.querySelector("img").src;
+        const imagen = elemento.querySelector("img.avatar")?.src || "Sin imagen";
+        const titulo = elemento.querySelector("h2 > a")?.innerText || "Sin título";
+        const parrafo = elemento.querySelector("p")?.innerText || "Sin párrafo";
+        const fechaPublicacion = elemento.querySelector("time")?.innerText || "Sin fecha";
 
-        const titulo = elemento.querySelector("block block--1 > post_title > a").innerText;
-        const parrafo = elemento.querySelector("block block--1 > post_tease > p").innerText;
-        const fechaPublicacion = elemento.querySelector("block block--1 > post_meta > published").innerText;
-        const data = {
-            pagina:{
-             imagen,
-             titulo,
-             parrafo,
-             fechaPublicacion
-            }
-        };
-
-        resultados.push(data);
+        resultados.push({
+          pagina: {
+            imagen,
+            titulo,
+            parrafo,
+            fechaPublicacion,
+          },
+        });
       });
     return resultados;
   });
-
   // Crear archivo JSON
   let jsonData = JSON.stringify(datos);
   fs.writeFileSync(".json", jsonData, "utf-8");
